@@ -4,6 +4,9 @@ const {
   login,
   getMe,
   getUserById,
+  updateUserById,
+  deleteUserById,
+  getAllUsersHandler,
 } = require("../controllers/userController");
 const { verifyToken } = require("../middleware/auth");
 
@@ -171,6 +174,46 @@ router.get("/me", verifyToken, getMe);
 
 /**
  * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Get all users
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 count:
+ *                   type: integer
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                       phone:
+ *                         type: string
+ *                       address:
+ *                         type: string
+ *       401:
+ *         description: Missing or invalid token
+ */
+router.get("/", verifyToken, getAllUsersHandler);
+
+/**
+ * @swagger
  * /api/users/{id}:
  *   get:
  *     summary: Get user by ID (internal use)
@@ -213,5 +256,74 @@ router.get("/me", verifyToken, getMe);
  *         description: User not found
  */
 router.get("/:id", verifyToken, getUserById);
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     summary: Update user profile
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: User not found
+ *       409:
+ *         description: Email already in use
+ */
+router.put("/:id", verifyToken, updateUserById);
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Delete user profile
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: User not found
+ */
+router.delete("/:id", verifyToken, deleteUserById);
 
 module.exports = router;

@@ -302,6 +302,57 @@ cd ../payment-service && npm start
 
 ## 🐛 Troubleshooting
 
+### Kill All Node Processes
+
+If you want to stop all running services at once:
+
+```bash
+# Kill all Node processes
+pkill -9 node
+
+# Or on some systems
+killall -9 node
+```
+
+### Kill a Specific Port
+
+If a specific port is stuck (e.g., port 8001):
+
+```bash
+# Kill process on port 8001
+lsof -i :8001 -t | xargs kill -9
+```
+
+**What this does:**
+- `lsof -i :8001` - Lists processes using port 8001
+- `-t` - Returns only the process ID
+- `xargs kill -9` - Kills that process forcefully
+
+### Kill Multiple Ports at Once
+
+```bash
+# Kill all service ports (8000-8005)
+for port in 8000 8001 8002 8003 8004 8005; do
+  lsof -i :$port -t | xargs kill -9 2>/dev/null
+done
+echo "All service ports cleared"
+```
+
+### Check What's Running on a Port
+
+Before killing, see what's using a port:
+
+```bash
+# Check specific port (e.g., 8001)
+lsof -i :8001
+
+# Check all ports
+lsof -i :8000 -i :8001 -i :8002 -i :8003 -i :8004 -i :8005
+
+# Or use netstat
+netstat -an | grep 8001
+```
+
 ### Service Won't Start
 
 ```bash

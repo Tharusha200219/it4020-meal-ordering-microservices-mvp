@@ -1,6 +1,16 @@
 // In-memory users storage
-let users = [];
-let userIdCounter = 1;
+let users = [
+  {
+    id: 1,
+    name: "Admin User",
+    email: "admin@gmail.com",
+    password: "admin",
+    phone: "1234567890",
+    address: "System Admin Address",
+    role: "admin",
+  }
+];
+let userIdCounter = 2;
 
 // Find user by email
 const findUserByEmail = (email) => {
@@ -21,6 +31,7 @@ const createUser = (name, email, password, phone, address) => {
     password, // Plain text for MVP
     phone,
     address,
+    role: "user",
   };
   users.push(user);
   return user;
@@ -43,6 +54,29 @@ const getAllUsers = () => {
   }));
 };
 
+// Update user by id
+const updateUser = (id, updateData) => {
+  const user = findUserById(id);
+  if (user) {
+    if (updateData.name !== undefined) user.name = updateData.name;
+    if (updateData.email !== undefined) user.email = updateData.email;
+    if (updateData.password !== undefined) user.password = updateData.password;
+    if (updateData.phone !== undefined) user.phone = updateData.phone;
+    if (updateData.address !== undefined) user.address = updateData.address;
+  }
+  return user;
+};
+
+// Delete user by id
+const deleteUser = (id) => {
+  const index = users.findIndex((user) => user.id === id);
+  if (index !== -1) {
+    users.splice(index, 1);
+    return true;
+  }
+  return false;
+};
+
 module.exports = {
   users,
   findUserByEmail,
@@ -50,4 +84,6 @@ module.exports = {
   createUser,
   getUserForResponse,
   getAllUsers,
+  updateUser,
+  deleteUser,
 };

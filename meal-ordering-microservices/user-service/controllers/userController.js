@@ -4,6 +4,9 @@ const {
   findUserById,
   createUser,
   getUserForResponse,
+  updateUser,
+  deleteUser,
+  getAllUsers,
 } = require("../models/data");
 
 /**
@@ -61,7 +64,7 @@ const login = (req, res) => {
 
   // Generate JWT token
   const token = jwt.sign(
-    { id: user.id, email: user.email, name: user.name },
+    { id: user.id, email: user.email, name: user.name, role: user.role || 'user' },
     process.env.JWT_SECRET,
     { expiresIn: "24h" },
   );
@@ -113,9 +116,94 @@ const getUserById = (req, res) => {
   });
 };
 
+/**
+ * Update user by ID
+ * PUT /api/users/:id
+ * Protected route
+ */
+const updateUserById = (req, res) => {
+  const { id } = req.params;
+  const userId = parseInt(id);
+
+  // Authorize: Only the user can update their own profile OR admin
+  const isAdmin = req.user.role === "admin" || req.user.email === "admin@gmail.com";
+  if (req.user.id !== userId && !isAdmin) {
+    return res.status(403).json({ error: "Forbidden: You can only update your own profile" });
+  }
+
+  const { name, email, password, phone, address } = req.body;
+  
+  if (email) {
+    const existing = findUserByEmail(email);
+    if (existing && existing.id !== userId) {
+      return res.status(409).json({ error: "Email already in use by another account" });
+    }
+  }
+
+  const updated = updateUser(userId, { name, email, password, phone, address });
+  if (!updated) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "User updated successfully",
+    user: getUserForResponse(updated),
+  });
+};
+
+/**
+ * Delete user by ID
+ * DELETE /api/users/:id
+ * Protected route
+ */
+const deleteUserById = (req, res) => {
+  const { id } = req.params;
+  const userId = parseInt(id);
+
+  const isAdmin = req.user.role === "admin" || req.user.email === "admin@gmail.com";
+  if (req.user.id !== userId && !isAdmin) {
+    return res.status(403).json({ error: "Forbidden: You can only delete your own profile" });
+  }
+
+  const success = deleteUser(userId);
+  if (!success) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "User deleted successfully",
+  });
+};
+
+/**
+ * Get all users
+ * GET /api/users
+ * Protected route
+ */
+const getAllUsersHandler = (req, res) => {
+  // Restrict to admin only
+  const isAdmin = req.user.role === "admin" || req.user.email === "admin@gmail.com";
+  if (!isAdmin) {
+    return res.status(403).json({ error: "Forbidden: Only admins can view all users" });
+  }
+
+  const users = getAllUsers();
+  
+  return res.status(200).json({
+    success: true,
+    count: users.length,
+    users: users,
+  });
+};
+
 module.exports = {
   register,
   login,
   getMe,
   getUserById,
+  updateUserById,
+  deleteUserById,
+  getAllUsersHandler,
 };
