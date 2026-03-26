@@ -212,13 +212,41 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/restaurants:
+* /api/restaurants:
  *   get:
  *     summary: Get all restaurants
  *     tags: [Restaurants]
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: List of restaurants
+ *
+ *   post:
+ *     summary: Create a new restaurant
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - location
+ *               - cuisine
+ *             properties:
+ *               name:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               cuisine:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Created
  */
 
 /**
@@ -227,6 +255,8 @@ const router = express.Router();
  *   get:
  *     summary: Get restaurant by ID
  *     tags: [Restaurants]
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -236,6 +266,68 @@ const router = express.Router();
  *     responses:
  *       200:
  *         description: Restaurant details
+ *       404:
+ *         description: Not found
+ */
+
+
+
+/**
+ * @swagger
+ * /api/restaurants/{id}:
+ *   put:
+ *     summary: Update restaurant
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Updated Name
+ *               location:
+ *                 type: string
+ *                 example: Kandy
+ *               cuisine:
+ *                 type: string
+ *                 example: Sri Lankan
+ *     responses:
+ *       200:
+ *         description: Updated successfully
+ *       404:
+ *         description: Not found
+ */
+
+/**
+ * @swagger
+ * /api/restaurants/{id}:
+ *   delete:
+ *     summary: Delete restaurant
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Deleted successfully
+ *       404:
+ *         description: Not found
  */
 
 /**
@@ -374,17 +466,28 @@ const router = express.Router();
 async function proxyRequest(req, res, baseURL) {
   try {
     const url = baseURL + req.url;
+    const headers = { ...req.headers };
+    delete headers.host;
+    delete headers['content-length'];
+
     const config = {
       method: req.method,
       url: url,
-      headers: { ...req.headers },
-      data: req.body && Object.keys(req.body).length > 0 ? req.body : undefined,
+      headers: headers,
       validateStatus: () => true,
       timeout: 10000,
     };
 
-    delete config.headers.host;
-    delete config.headers['content-length'];
+    // For requests with body (POST, PUT, PATCH), include data
+    if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'DELETE') {
+      if (req.body && Object.keys(req.body).length > 0) {
+        config.data = req.body;
+        // Ensure content-type is set
+        if (!headers['content-type']) {
+          headers['content-type'] = 'application/json';
+        }
+      }
+    }
 
     const response = await axios(config);
     Object.keys(response.headers).forEach((key) => {

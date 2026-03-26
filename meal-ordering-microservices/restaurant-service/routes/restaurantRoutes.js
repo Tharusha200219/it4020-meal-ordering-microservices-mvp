@@ -52,23 +52,19 @@ router.post('/', auth, createRestaurant);
  * /api/restaurants:
  *   get:
  *     summary: Get all restaurants
- *     security:
- *       - BearerAuth: []
  *     tags:
  *       - Restaurants
  *     responses:
  *       200:
  *         description: List of restaurants
  */
-router.get('/', auth, getAllRestaurants);
+router.get('/', getAllRestaurants);
 
 /**
  * @swagger
  * /api/restaurants/{id}:
  *   get:
  *     summary: Get restaurant by ID
- *     security:
- *       - BearerAuth: []
  *     tags:
  *       - Restaurants
  *     parameters:
@@ -83,7 +79,7 @@ router.get('/', auth, getAllRestaurants);
  *       404:
  *         description: Not found
  */
-router.get('/:id', auth, getRestaurantById);
+router.get('/:id', getRestaurantById);
 
 /**
  * @swagger
