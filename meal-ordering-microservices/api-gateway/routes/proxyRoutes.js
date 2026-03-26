@@ -241,20 +241,64 @@ const router = express.Router();
 /**
  * @swagger
  * /api/menus:
+ *   post:
+ *     summary: Create a new menu item
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - restaurant_id
+ *               - name
+ *               - description
+ *               - price
+ *             properties:
+ *               restaurant_id:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: Menu item created successfully
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
  *   get:
- *     summary: Get all menu items
- *     tags: [Menu]
+ *     summary: Get all menus or filter by restaurant_id
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: restaurant_id
+ *         required: false
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: List of menu items
+ *       401:
+ *         description: Unauthorized
  */
 
 /**
  * @swagger
  * /api/menus/{id}:
  *   get:
- *     summary: Get menu item by ID
- *     tags: [Menu]
+ *     summary: Get one menu item by ID
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -263,7 +307,64 @@ const router = express.Router();
  *           type: integer
  *     responses:
  *       200:
- *         description: Menu item details
+ *         description: Menu item found
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Menu item not found
+ *   put:
+ *     summary: Update a menu item
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               restaurant_id:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Menu item updated successfully
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Menu item not found
+ *   delete:
+ *     summary: Delete a menu item
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Menu item deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Menu item not found
  */
 
 /**
