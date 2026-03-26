@@ -26,22 +26,6 @@ http://localhost:8001/api-docs
 
 ---
 
-## 👑 Default Admin User
-
-A default system administrator account is pre-configured and can manage all users.
-
-**Email:** `admin@gmail.com`
-**Password:** `admin`
-
-**Admin Permissions:**
-- Can `PUT /api/users/:id` to update any user's profile
-- Can `DELETE /api/users/:id` to delete any user account
-- Can `GET /api/users` to view all registered users in the system
-
-*(Regular users can only update/delete their own profile and cannot view the full list of users).*
-
----
-
 ## 📝 How to Register a User in Swagger
 
 ### Step 1: Navigate to the Register Endpoint
@@ -246,6 +230,7 @@ lsof -i :8001 -t | xargs kill -9
 ```
 
 **What this does:**
+
 - `lsof -i :8001` - Lists processes using port 8001
 - `-t` - Returns only the process ID
 - `xargs kill -9` - Kills that process forcefully
@@ -322,11 +307,8 @@ netstat -an | grep 8001
 | ------ | --------------------- | --------- | ------------------------ |
 | POST   | `/api/users/register` | ❌        | Register new user        |
 | POST   | `/api/users/login`    | ❌        | Login & get JWT token    |
-| GET    | `/api/users`          | ✅        | Get all users            |
 | GET    | `/api/users/me`       | ✅        | Get current user profile |
 | GET    | `/api/users/:id`      | ✅        | Get user by ID           |
-| PUT    | `/api/users/:id`      | ✅        | Update user profile      |
-| DELETE | `/api/users/:id`      | ✅        | Delete user profile      |
 
 ---
 

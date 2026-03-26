@@ -324,6 +324,7 @@ lsof -i :8001 -t | xargs kill -9
 ```
 
 **What this does:**
+
 - `lsof -i :8001` - Lists processes using port 8001
 - `-t` - Returns only the process ID
 - `xargs kill -9` - Kills that process forcefully
