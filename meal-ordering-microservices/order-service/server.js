@@ -1,24 +1,28 @@
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const { swaggerUi, swaggerDocs } = require('./swagger');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
 const orderRoutes = require('./routes/orderRoutes');
-
-dotenv.config();
+require('dotenv').config();
 
 const app = express();
+const PORT = process.env.PORT || 8004;
+
 app.use(cors());
 app.use(express.json());
 
-// Swagger Docs
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use('/api/orders', orderRoutes);
 
-const PORT = process.env.PORT || 8004;
+app.get('/', (req, res) => {
+  res.send('✅ Order Service is running! (Member 4 - Full CRUD)');
+});
 
 app.listen(PORT, () => {
-  console.log(`Order Service running on port ${PORT}`);
-  console.log(`Swagger docs available at http://localhost:${PORT}/api-docs`);
+  console.log(`🚀 Order Service running on http://localhost:${PORT}`);
+  console.log(`📄 Swagger UI: http://localhost:${PORT}/api-docs`);
+  console.log(`📄 Via Gateway: http://localhost:8000/swagger/order-service/api-docs`);
 });
