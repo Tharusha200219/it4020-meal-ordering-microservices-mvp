@@ -212,12 +212,12 @@ const router = express.Router();
 
 /**
  * @swagger
-* /api/restaurants:
+ * /api/restaurants:
  *   get:
  *     summary: Get all restaurants
  *     tags: [Restaurants]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: List of restaurants
@@ -247,16 +247,14 @@ const router = express.Router();
  *     responses:
  *       201:
  *         description: Created
- */
-
-/**
+ *//**
  * @swagger
  * /api/restaurants/{id}:
  *   get:
  *     summary: Get restaurant by ID
  *     tags: [Restaurants]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -269,8 +267,6 @@ const router = express.Router();
  *       404:
  *         description: Not found
  */
-
-
 
 /**
  * @swagger
@@ -462,58 +458,102 @@ const router = express.Router();
 /**
  * @swagger
  * /api/orders:
- *   get:
- *     summary: Get all orders
- *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: List of orders
  *   post:
  *     summary: Create a new order
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
+ *     security: [{ bearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - user_id
- *               - items
- *               - total_price
  *             properties:
- *               user_id:
- *                 type: integer
+ *               restaurant_id: { type: number, example: 1 }
  *               items:
  *                 type: array
- *               total_price:
- *                 type: number
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     menu_id: { type: number }
+ *                     qty: { type: number }
  *     responses:
- *       201:
- *         description: Order created
+ *       201: { description: "Order created successfully" }
+ *
+ *   get:
+ *     summary: Get my orders
+ *     tags: [Orders]
+ *     security: [{ bearerAuth: [] }]
+ *     responses: { 200: { description: "List of orders" } }
  */
 
 /**
  * @swagger
  * /api/orders/{id}:
  *   get:
- *     summary: Get order by ID
+ *     summary: Get single order by ID
  *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
  *         required: true
  *         schema:
  *           type: integer
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Order details
+ *
+ *   put:
+ *     summary: Update order (status OR change items / restaurant)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [confirmed, delivered]
+ *               restaurant_id:
+ *                 type: number
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     menu_id: { type: number }
+ *                     qty: { type: number }
+ *
+ *     responses:
+ *       200:
+ *         description: Order updated successfully
+ *
+ *   delete:
+ *     summary: Cancel a pending order
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Order cancelled successfully
  */
 
 /**
@@ -569,23 +609,38 @@ async function proxyRequest(req, res, baseURL) {
     const url = baseURL + req.url;
     const headers = { ...req.headers };
     delete headers.host;
-    delete headers['content-length'];
+    delete headers["content-length"];
+    delete headers["connection"];
+    delete headers["accept-encoding"];
+
+    // FORCE Authorization header (this fixes the issue)
+    if (req.headers.authorization || req.headers.Authorization) {
+      headers.authorization =
+        req.headers.authorization || req.headers.Authorization;
+    }
 
     const config = {
       method: req.method,
       url: url,
       headers: headers,
+      data: ["POST", "PUT", "PATCH", "DELETE"].includes(req.method)
+        ? req.body
+        : undefined,
       validateStatus: () => true,
       timeout: 10000,
     };
 
     // For requests with body (POST, PUT, PATCH), include data
-    if (req.method !== 'GET' && req.method !== 'HEAD' && req.method !== 'DELETE') {
+    if (
+      req.method !== "GET" &&
+      req.method !== "HEAD" &&
+      req.method !== "DELETE"
+    ) {
       if (req.body && Object.keys(req.body).length > 0) {
         config.data = req.body;
         // Ensure content-type is set
-        if (!headers['content-type']) {
-          headers['content-type'] = 'application/json';
+        if (!headers["content-type"]) {
+          headers["content-type"] = "application/json";
         }
       }
     }
