@@ -1,23 +1,16 @@
+// order-service/routes/orderRoutes.js
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
 const orderController = require('../controllers/orderController');
-
-/**
- * @swagger
- * tags:
- *   name: Orders
- *   description: Order management and orchestration
- */
+const authenticateToken = require('../middleware/auth');
 
 /**
  * @swagger
  * /api/orders:
  *   post:
- *     summary: Create a new order
+ *     summary: Create a new order (orchestrates User, Restaurant, Menu)
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
+ *     security: [{ BearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
@@ -25,81 +18,46 @@ const orderController = require('../controllers/orderController');
  *           schema:
  *             type: object
  *             properties:
- *               restaurant_id:
- *                 type: integer
- *               items:
+ *               restaurant_id: { type: number, example: 1 }
+ *               items: 
  *                 type: array
- *                 items:
+ *                 items: 
  *                   type: object
- *                   properties:
- *                     menu_id:
- *                       type: integer
- *                     qty:
- *                       type: integer
+ *                   properties: 
+ *                     menu_id: { type: number }
+ *                     qty: { type: number }
  *     responses:
- *       201:
- *         description: Order created successfully
- *       400:
- *         description: Invalid input
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: Verification failed (User/Restaurant/Menu missing or mismatch)
- */
-router.post('/', auth, orderController.createOrder);
-
-/**
- * @swagger
- * /api/orders:
+ *       201: { description: Order created successfully }
+ * 
  *   get:
- *     summary: Get all orders for the logged-in user
+ *     summary: Get my orders
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
+ *     security: [{ BearerAuth: [] }]
  *     responses:
- *       200:
- *         description: List of user orders
- *       401:
- *         description: Unauthorized
- */
-router.get('/', auth, orderController.getMyOrders);
-
-/**
- * @swagger
+ *       200: { description: List of orders }
+ * 
  * /api/orders/{id}:
  *   get:
- *     summary: Get a specific order by ID
+ *     summary: Get single order by ID
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
  *         required: true
- *         schema:
- *           type: integer
+ *         schema: { type: number }
  *     responses:
- *       200:
- *         description: Order details
- *       404:
- *         description: Order not found
- */
-router.get('/:id', auth, orderController.getOrderById);
-
-/**
- * @swagger
- * /api/orders/{id}/status:
+ *       200: { description: Order details }
+ * 
  *   put:
- *     summary: Update order status (Internal use by Payment Service)
+ *     summary: Update order (status OR change items / restaurant)
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
+ *     security: [{ BearerAuth: [] }]
  *     parameters:
- *       - in: path
- *         name: id
+ *       - name: id
+ *         in: path
  *         required: true
- *         schema:
- *           type: integer
+ *         schema: { type: number }
  *     requestBody:
  *       required: true
  *       content:
@@ -109,13 +67,36 @@ router.get('/:id', auth, orderController.getOrderById);
  *             properties:
  *               status:
  *                 type: string
- *                 example: confirmed
+ *                 enum: [confirmed, delivered]
+ *               restaurant_id:
+ *                 type: number
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     menu_id: { type: number }
+ *                     qty: { type: number }
  *     responses:
- *       200:
- *         description: Order status updated
- *       404:
- *         description: Order not found
+ *       200: { description: Order updated successfully }
+ * 
+ *   delete:
+ *     summary: Cancel pending order
+ *     tags: [Orders]
+ *     security: [{ BearerAuth: [] }]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema: { type: number }
+ *     responses:
+ *       200: { description: Order cancelled successfully }
  */
-router.put('/:id/status', auth, orderController.updateOrderStatus);
+
+router.post('/', authenticateToken, orderController.createOrder);
+router.get('/', authenticateToken, orderController.getMyOrders);
+router.get('/:id', authenticateToken, orderController.getOrderById);
+router.put('/:id', authenticateToken, orderController.updateOrder);   // ← works with new handler
+router.delete('/:id', authenticateToken, orderController.cancelOrder);
 
 module.exports = router;

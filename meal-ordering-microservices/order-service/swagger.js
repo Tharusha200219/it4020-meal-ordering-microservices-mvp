@@ -1,41 +1,28 @@
 const swaggerJsDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
 
 const swaggerOptions = {
-  swaggerDefinition: {
+  definition: {
     openapi: '3.0.0',
     info: {
       title: 'Order Service API',
       version: '1.0.0',
-      description: 'API for managing orders and orchestrating microservices.',
+      description: 'Order Service for Meal Ordering System (Member 4) - Full CRUD'
     },
     servers: [
-      {
-        url: 'http://localhost:8004',
-      },
-      {
-        url: 'http://localhost:8000',
-        description: 'Gateway Proxy'
-      }
+      { url: 'http://localhost:8004' },
+      { url: 'http://localhost:8000' }
     ],
     components: {
       securitySchemes: {
-        bearerAuth: {
+        BearerAuth: {
           type: 'http',
           scheme: 'bearer',
-          bearerFormat: 'JWT',
+          bearerFormat: 'JWT'
         }
       }
-    },
-    security: [
-      {
-        bearerAuth: [],
-      }
-    ],
+    }
   },
-  apis: ['./routes/*.js'],
+  apis: ['./routes/*.js']
 };
 
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-
-module.exports = { swaggerUi, swaggerDocs };
+module.exports = swaggerJsDoc(swaggerOptions);
