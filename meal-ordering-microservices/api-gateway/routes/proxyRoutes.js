@@ -216,70 +216,15 @@ const router = express.Router();
  *   get:
  *     summary: Get all restaurants
  *     tags: [Restaurants]
- *     responses:
- *       200:
- *         description: List of restaurants
- */
-
-/**
- * @swagger
- * /api/restaurants/{id}:
- *   get:
- *     summary: Get restaurant by ID
- *     tags: [Restaurants]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Restaurant details
- */
-
-/**
- * @swagger
- * /api/menus:
- *   get:
- *     summary: Get all menu items
- *     tags: [Menu]
- *     responses:
- *       200:
- *         description: List of menu items
- */
-
-/**
- * @swagger
- * /api/menus/{id}:
- *   get:
- *     summary: Get menu item by ID
- *     tags: [Menu]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Menu item details
- */
-
-/**
- * @swagger
- * /api/orders:
- *   get:
- *     summary: Get all orders
- *     tags: [Orders]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: List of orders
+ *         description: List of restaurants
+ *
  *   post:
- *     summary: Create a new order
- *     tags: [Orders]
+ *     summary: Create a new restaurant
+ *     tags: [Restaurants]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -289,38 +234,326 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             required:
- *               - user_id
- *               - items
- *               - total_price
+ *               - name
+ *               - location
+ *               - cuisine
  *             properties:
- *               user_id:
- *                 type: integer
- *               items:
- *                 type: array
- *               total_price:
- *                 type: number
+ *               name:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               cuisine:
+ *                 type: string
  *     responses:
  *       201:
- *         description: Order created
- */
-
-/**
+ *         description: Created
+ *//**
  * @swagger
- * /api/orders/{id}:
+ * /api/restaurants/{id}:
  *   get:
- *     summary: Get order by ID
- *     tags: [Orders]
+ *     summary: Get restaurant by ID
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: integer
+ *     responses:
+ *       200:
+ *         description: Restaurant details
+ *       404:
+ *         description: Not found
+ */
+
+/**
+ * @swagger
+ * /api/restaurants/{id}:
+ *   put:
+ *     summary: Update restaurant
+ *     tags: [Restaurants]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Updated Name
+ *               location:
+ *                 type: string
+ *                 example: Kandy
+ *               cuisine:
+ *                 type: string
+ *                 example: Sri Lankan
+ *     responses:
+ *       200:
+ *         description: Updated successfully
+ *       404:
+ *         description: Not found
+ */
+
+/**
+ * @swagger
+ * /api/restaurants/{id}:
+ *   delete:
+ *     summary: Delete restaurant
+ *     tags: [Restaurants]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Deleted successfully
+ *       404:
+ *         description: Not found
+ */
+
+/**
+ * @swagger
+ * /api/menus:
+ *   post:
+ *     summary: Create a new menu item
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - restaurant_id
+ *               - name
+ *               - description
+ *               - price
+ *             properties:
+ *               restaurant_id:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: Menu item created successfully
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
+ *   get:
+ *     summary: Get all menus or filter by restaurant_id
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: restaurant_id
+ *         required: false
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of menu items
+ *       401:
+ *         description: Unauthorized
+ */
+
+/**
+ * @swagger
+ * /api/menus/{id}:
+ *   get:
+ *     summary: Get one menu item by ID
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Menu item found
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Menu item not found
+ *   put:
+ *     summary: Update a menu item
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               restaurant_id:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Menu item updated successfully
+ *       400:
+ *         description: Invalid input
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Menu item not found
+ *   delete:
+ *     summary: Delete a menu item
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Menu item deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Menu item not found
+ */
+
+/**
+ * @swagger
+ * /api/orders:
+ *   post:
+ *     summary: Create a new order
+ *     tags: [Orders]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               restaurant_id: { type: number, example: 1 }
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     menu_id: { type: number }
+ *                     qty: { type: number }
+ *     responses:
+ *       201: { description: "Order created successfully" }
+ *
+ *   get:
+ *     summary: Get my orders
+ *     tags: [Orders]
+ *     security: [{ bearerAuth: [] }]
+ *     responses: { 200: { description: "List of orders" } }
+ */
+
+/**
+ * @swagger
+ * /api/orders/{id}:
+ *   get:
+ *     summary: Get single order by ID
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
  *     responses:
  *       200:
  *         description: Order details
+ *
+ *   put:
+ *     summary: Update order (status OR change items / restaurant)
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [confirmed, delivered]
+ *               restaurant_id:
+ *                 type: number
+ *               items:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     menu_id: { type: number }
+ *                     qty: { type: number }
+ *
+ *     responses:
+ *       200:
+ *         description: Order updated successfully
+ *
+ *   delete:
+ *     summary: Cancel a pending order
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Order cancelled successfully
  */
 
 /**
@@ -374,17 +607,43 @@ const router = express.Router();
 async function proxyRequest(req, res, baseURL) {
   try {
     const url = baseURL + req.url;
+    const headers = { ...req.headers };
+    delete headers.host;
+    delete headers["content-length"];
+    delete headers["connection"];
+    delete headers["accept-encoding"];
+
+    // FORCE Authorization header (this fixes the issue)
+    if (req.headers.authorization || req.headers.Authorization) {
+      headers.authorization =
+        req.headers.authorization || req.headers.Authorization;
+    }
+
     const config = {
       method: req.method,
       url: url,
-      headers: { ...req.headers },
-      data: req.body && Object.keys(req.body).length > 0 ? req.body : undefined,
+      headers: headers,
+      data: ["POST", "PUT", "PATCH", "DELETE"].includes(req.method)
+        ? req.body
+        : undefined,
       validateStatus: () => true,
       timeout: 10000,
     };
 
-    delete config.headers.host;
-    delete config.headers['content-length'];
+    // For requests with body (POST, PUT, PATCH), include data
+    if (
+      req.method !== "GET" &&
+      req.method !== "HEAD" &&
+      req.method !== "DELETE"
+    ) {
+      if (req.body && Object.keys(req.body).length > 0) {
+        config.data = req.body;
+        // Ensure content-type is set
+        if (!headers["content-type"]) {
+          headers["content-type"] = "application/json";
+        }
+      }
+    }
 
     const response = await axios(config);
     Object.keys(response.headers).forEach((key) => {
