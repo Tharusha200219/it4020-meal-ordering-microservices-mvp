@@ -1,37 +1,43 @@
-const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerJSDoc = require("swagger-jsdoc");
 
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Payment Service API",
-      version: "1.0.0",
-      description: "Payment service for Meal Ordering Microservices MVP",
-      contact: {
-        name: "API Support",
-        email: "support@example.com",
-      },
-    },
-    servers: [
-      {
-        url: "http://localhost:8005",
-        description: "Development server",
-      },
-    ],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-        },
-      },
-    },
-    security: [],
+const swaggerDefinition = {
+  openapi: "3.0.0",
+  info: {
+    title: "Payment Service API",
+    version: "1.0.0",
+    description: "API for managing payments in the Meal Ordering System",
   },
-  apis: ["./routes/*.js"],
+  servers: [
+    {
+      url: "http://localhost:8005",
+      description: "Local Development Server",
+    },
+    {
+      url: "http://localhost:8000",
+      description: "API Gateway",
+    }
+  ],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      },
+    },
+  },
+  security: [
+    {
+      bearerAuth: [],
+    },
+  ],
 };
 
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
+const options = {
+  swaggerDefinition,
+  apis: ["./routes/*.js", "./server.js"],
+};
+
+const swaggerSpec = swaggerJSDoc(options);
 
 module.exports = swaggerSpec;
