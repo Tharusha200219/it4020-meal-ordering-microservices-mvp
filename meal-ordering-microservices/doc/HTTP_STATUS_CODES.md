@@ -28,13 +28,13 @@ Status Code: XXX
 
 HTTP status codes are divided into 5 categories based on the first digit:
 
-| Range | Category | Meaning |
-|-------|----------|---------|
+| Range   | Category      | Meaning                                 |
+| ------- | ------------- | --------------------------------------- |
 | **1xx** | Informational | Request received, processing continuing |
-| **2xx** | Success | Request successful ✓ |
-| **3xx** | Redirection | Further action needed |
-| **4xx** | Client Error | Client's mistake ✗ |
-| **5xx** | Server Error | Server's fault ✗ |
+| **2xx** | Success       | Request successful ✓                    |
+| **3xx** | Redirection   | Further action needed                   |
+| **4xx** | Client Error  | Client's mistake ✗                      |
+| **5xx** | Server Error  | Server's fault ✗                        |
 
 ---
 
@@ -45,8 +45,8 @@ Your microservices project uses these specific status codes:
 ```
 200 - OK (Success)
 201 - Created (Success - Resource Created)
-400 - Bad Request (Client Error) 
-401 - Unauthorized (Authentication Error) token required 
+400 - Bad Request (Client Error)
+401 - Unauthorized (Authentication Error) token required
 403 - Forbidden (Authorization Error) permission (token)
 404 - Not Found (Resource doesn't exist)
 409 - Conflict (Resource already exists) email
@@ -54,6 +54,7 @@ Your microservices project uses these specific status codes:
 ```
 
 **In this documentation, we focus on:**
+
 - ✓ **200** → Request successful
 - ✓ **201** → New resource created
 - ✗ **400** → Client sent bad data
@@ -88,13 +89,13 @@ Barista: "Yes, here's your coffee" ← 200 OK
 
 #### When Used in Your Project:
 
-| Endpoint | Scenario | Example |
-|----------|----------|---------|
-| `GET /api/users/me` | User logged in, requesting their profile | Returns: `{ id: 1, name: "John", email: "john@example.com" }` |
-| `GET /api/payments` | Fetching all payments | Returns: `[ { id: 1, amount: 49.99 }, ... ]` |
-| `GET /api/orders/:id` | Getting specific order details | Returns: `{ id: 5, total_price: 99.99, status: "pending" }` |
-| `GET /api/menu` | Fetching menu items | Returns: `[ { id: 1, name: "Pizza", price: 12.99 }, ... ]` |
-| `GET /health` | Health check | Returns: `{ status: "Server is running" }` |
+| Endpoint              | Scenario                                 | Example                                                       |
+| --------------------- | ---------------------------------------- | ------------------------------------------------------------- |
+| `GET /api/users/me`   | User logged in, requesting their profile | Returns: `{ id: 1, name: "John", email: "john@example.com" }` |
+| `GET /api/payments`   | Fetching all payments                    | Returns: `[ { id: 1, amount: 49.99 }, ... ]`                  |
+| `GET /api/orders/:id` | Getting specific order details           | Returns: `{ id: 5, total_price: 99.99, status: "pending" }`   |
+| `GET /api/menu`       | Fetching menu items                      | Returns: `[ { id: 1, name: "Pizza", price: 12.99 }, ... ]`    |
+| `GET /health`         | Health check                             | Returns: `{ status: "Server is running" }`                    |
 
 #### Code Example:
 
@@ -103,9 +104,9 @@ Barista: "Yes, here's your coffee" ← 200 OK
 const getMe = (req, res) => {
   // User is authenticated (token verified)
   // req.user contains their data
-  
+
   const user = findUserById(req.user.id);
-  
+
   return res.status(200).json({
     success: true,
     user: {
@@ -113,8 +114,8 @@ const getMe = (req, res) => {
       name: user.name,
       email: user.email,
       phone: user.phone,
-      address: user.address
-    }
+      address: user.address,
+    },
   });
 };
 
@@ -136,9 +137,10 @@ const getMe = (req, res) => {
 ```
 
 #### When You See 200:
+
 ✓ Request was successful  
 ✓ Data was found and returned  
-✓ No errors occurred  
+✓ No errors occurred
 
 ---
 
@@ -168,11 +170,11 @@ Bank: "Done! Here's your new account number: 123456" ← 201 Created
 
 #### When Used in Your Project:
 
-| Endpoint | Scenario | Example |
-|----------|----------|---------|
-| `POST /api/users/register` | Creating new user account | Creates user and returns: `{ userId: 2, name: "Jane" }` |
-| `POST /api/payments` | Creating new payment | Creates payment and returns: `{ id: 1, order_id: 5, amount: 49.99 }` |
-| `POST /api/orders` | Creating new order | Creates order and returns: `{ id: 10, total_price: 99.99 }` |
+| Endpoint                   | Scenario                  | Example                                                              |
+| -------------------------- | ------------------------- | -------------------------------------------------------------------- |
+| `POST /api/users/register` | Creating new user account | Creates user and returns: `{ userId: 2, name: "Jane" }`              |
+| `POST /api/payments`       | Creating new payment      | Creates payment and returns: `{ id: 1, order_id: 5, amount: 49.99 }` |
+| `POST /api/orders`         | Creating new order        | Creates order and returns: `{ id: 10, total_price: 99.99 }`          |
 
 #### Code Example:
 
@@ -197,8 +199,8 @@ const register = (req, res) => {
     user: {
       id: user.id,
       name: user.name,
-      email: user.email
-    }
+      email: user.email,
+    },
   });
 };
 
@@ -246,6 +248,7 @@ POST /api/users  → Create new user → 201 Created (new)
 ```
 
 #### When You See 201:
+
 ✓ Request was successful  
 ✓ New resource was created  
 ✓ Resource has an ID (check the response for it)
@@ -279,13 +282,13 @@ Restaurant: "Bad Request! Which pizzas do you want?" ← 400 Bad Request
 
 #### When Used in Your Project:
 
-| Endpoint | Why 400 | Example |
-|----------|---------|---------|
-| `POST /api/users/register` | Missing required fields (name/email/password) | Response: `{ error: "name, email, and password are required" }` |
-| `POST /api/users/login` | Missing email or password | Response: `{ error: "email and password are required" }` |
-| `POST /api/payments` | Invalid payment_method or missing order_id | Response: `{ error: "order_id and payment_method are required" }` |
-| `POST /api/payments` | Payment method not in allowed list | Response: `{ error: "Invalid payment_method. Allowed: card, cash, online" }` |
-| `POST /api/payments` | Order status is not "pending" | Response: `{ error: "Cannot process payment for order with status 'completed'" }` |
+| Endpoint                   | Why 400                                       | Example                                                                           |
+| -------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------- |
+| `POST /api/users/register` | Missing required fields (name/email/password) | Response: `{ error: "name, email, and password are required" }`                   |
+| `POST /api/users/login`    | Missing email or password                     | Response: `{ error: "email and password are required" }`                          |
+| `POST /api/payments`       | Invalid payment_method or missing order_id    | Response: `{ error: "order_id and payment_method are required" }`                 |
+| `POST /api/payments`       | Payment method not in allowed list            | Response: `{ error: "Invalid payment_method. Allowed: card, cash, online" }`      |
+| `POST /api/payments`       | Order status is not "pending"                 | Response: `{ error: "Cannot process payment for order with status 'completed'" }` |
 
 #### Code Examples:
 
@@ -299,8 +302,8 @@ const register = (req, res) => {
   // Check: Are name, email, password provided?
   if (!name || !email || !password) {
     // ✗ No! Send 400 Bad Request
-    return res.status(400).json({ 
-      error: "name, email, and password are required" 
+    return res.status(400).json({
+      error: "name, email, and password are required",
     });
   }
 
@@ -329,12 +332,12 @@ const processPayment = async (req, res) => {
   const { order_id, payment_method } = req.body;
 
   // Check: Is payment_method valid?
-  const validMethods = ['card', 'cash', 'online'];
+  const validMethods = ["card", "cash", "online"];
   if (!validMethods.includes(payment_method)) {
     // ✗ No! Send 400 Bad Request
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Invalid payment_method. Allowed: card, cash, online' 
+    return res.status(400).json({
+      success: false,
+      message: "Invalid payment_method. Allowed: card, cash, online",
     });
   }
 
@@ -362,14 +365,14 @@ const processPayment = async (req, res) => {
 // In paymentController.js
 const processPayment = async (req, res) => {
   // ... validation ...
-  
+
   // Check: Is order status "pending"?
   const orderData = orderResponse.data.order || orderResponse.data;
-  if (orderData.status !== 'pending') {
+  if (orderData.status !== "pending") {
     // ✗ Order already processed! Send 400 Bad Request
-    return res.status(400).json({ 
-      success: false, 
-      message: `Cannot process payment for order with status '${orderData.status}'. Must be 'pending'.` 
+    return res.status(400).json({
+      success: false,
+      message: `Cannot process payment for order with status '${orderData.status}'. Must be 'pending'.`,
     });
   }
 
@@ -392,6 +395,7 @@ const processPayment = async (req, res) => {
 ```
 
 #### When You See 400:
+
 ✗ Your request had invalid data  
 ✗ Some required fields are missing  
 ✗ Some values don't match expected format  
@@ -408,16 +412,17 @@ Found **20 occurrences** in `ARCHITECTURE_FAQ.md`:
 #### 200 OK (1 occurrence)
 
 **Line 312**: User login success response
+
 ```javascript
 const login = (req, res) => {
   // ... validation ...
-  
+
   // After successful login
   return res.status(200).json({
     success: true,
     message: "Login successful",
     token,
-    user: getUserForResponse(user)
+    user: getUserForResponse(user),
   });
 };
 ```
@@ -431,14 +436,14 @@ const login = (req, res) => {
 return res.status(201).json({
   success: true,
   message: "User registered successfully",
-  userId: user.id
+  userId: user.id,
 });
 
 // Line 385, 554 - Payment creation
 res.status(201).json({
   success: true,
-  message: 'Payment processed successfully',
-  payment: newPayment
+  message: "Payment processed successfully",
+  payment: newPayment,
 });
 ```
 
@@ -460,16 +465,16 @@ res.status(201).json({
 
 ### Complete HTTP Status Code Reference for Your Project
 
-| Code | Status | Category | Meaning | Example Scenario |
-|------|--------|----------|---------|-------------------|
-| **200** | OK | ✓ Success | Request successful, data returned | `GET /api/users/me` - Returns current user |
-| **201** | Created | ✓ Success | New resource created | `POST /api/users/register` - New user account created |
-| **400** | Bad Request | ✗ Client Error | Invalid/missing data from client | `POST /api/users/register` without email field |
-| 401 | Unauthorized | ✗ Client Error | No/invalid authentication token | `GET /api/users/me` without JWT token |
-| 403 | Forbidden | ✗ Client Error | Authenticated but no permission | User tries to access another user's profile |
-| 404 | Not Found | ✗ Client Error | Resource doesn't exist | `GET /api/users/999` - User 999 doesn't exist |
-| 409 | Conflict | ✗ Client Error | Resource already exists | Register with email that already exists |
-| 500 | Server Error | ✗ Server Error | Server crashed/error | Unexpected server-side error |
+| Code    | Status       | Category       | Meaning                           | Example Scenario                                      |
+| ------- | ------------ | -------------- | --------------------------------- | ----------------------------------------------------- |
+| **200** | OK           | ✓ Success      | Request successful, data returned | `GET /api/users/me` - Returns current user            |
+| **201** | Created      | ✓ Success      | New resource created              | `POST /api/users/register` - New user account created |
+| **400** | Bad Request  | ✗ Client Error | Invalid/missing data from client  | `POST /api/users/register` without email field        |
+| 401     | Unauthorized | ✗ Client Error | No/invalid authentication token   | `GET /api/users/me` without JWT token                 |
+| 403     | Forbidden    | ✗ Client Error | Authenticated but no permission   | User tries to access another user's profile           |
+| 404     | Not Found    | ✗ Client Error | Resource doesn't exist            | `GET /api/users/999` - User 999 doesn't exist         |
+| 409     | Conflict     | ✗ Client Error | Resource already exists           | Register with email that already exists               |
+| 500     | Server Error | ✗ Server Error | Server crashed/error              | Unexpected server-side error                          |
 
 ---
 
@@ -480,36 +485,31 @@ res.status(201).json({
 ```javascript
 // Pseudo-code for frontend handling
 
-fetch('http://localhost:8000/api/users/register', {
-  method: 'POST',
-  body: JSON.stringify({ name: 'John', email: 'john@example.com', password: 'pass123' })
-})
-.then(response => {
-  
+fetch("http://localhost:8000/api/users/register", {
+  method: "POST",
+  body: JSON.stringify({
+    name: "John",
+    email: "john@example.com",
+    password: "pass123",
+  }),
+}).then((response) => {
   if (response.status === 201) {
     // ✓ Success! New user created
-    console.log('Account created successfully');
-    navigate('/login');
-  }
-  
-  else if (response.status === 400) {
+    console.log("Account created successfully");
+    navigate("/login");
+  } else if (response.status === 400) {
     // ✗ Client error - show error message
     const data = response.json();
-    alert('Error: ' + data.error);
+    alert("Error: " + data.error);
     // Example: "Error: email already registered"
-  }
-  
-  else if (response.status === 409) {
+  } else if (response.status === 409) {
     // ✗ Resource exists
-    alert('Email already registered');
-  }
-  
-  else if (response.status === 500) {
+    alert("Email already registered");
+  } else if (response.status === 500) {
     // ✗ Server error
-    alert('Server error. Please try again later.');
+    alert("Server error. Please try again later.");
   }
-  
-})
+});
 ```
 
 ---
@@ -550,7 +550,7 @@ User Registration Flow:
 1. User fills form: name, email, password
 2. Frontend sends: POST /api/users/register
 3. Server validates:
-   - Has all required fields? 
+   - Has all required fields?
    - Is email unique?
 4. If valid → 201 Created (new account!)
 5. If invalid → 400 Bad Request (fix your data!)
@@ -565,4 +565,3 @@ Payment Processing Flow:
 4. If valid → 201 Created (payment processed!)
 5. If invalid → 400 Bad Request (cannot process)
 ```
-
